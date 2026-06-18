@@ -8,9 +8,12 @@
 <style>
 :root {
     --cyan: #7df9ff;
-    --muted-white: rgba(255, 255, 255, 0.6);
+    --muted-white: rgba(255, 255, 255, 0.7);
     --adv-color: #4ade80;
     --disadv-color: #f87171;
+    /* Adaptive typography multipliers controlled by JS scaling */
+    --text-scale-multiplier: 1.0;
+    --card-text-scale-multiplier: 1.0;
 }
 
 * {
@@ -21,7 +24,7 @@
 
 body {
     overflow: hidden;
-    background: radial-gradient(circle at center, #1f1f23 0%, #09090a 100%);
+    background: radial-gradient(circle at center, #1a1a1d 0%, #050506 100%);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     height: 100vh;
     width: 100vw;
@@ -34,7 +37,7 @@ body {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.5) 80%, rgba(0,0,0,0.9) 100%);
+    background: radial-gradient(circle, transparent 35%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0.95) 100%);
     z-index: 10;
 }
 
@@ -43,14 +46,31 @@ body {
     justify-content: center;
     align-items: center;
     transform-origin: center center;
-    transition: transform 0.1s ease-out;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .wrapper {
     position: relative;
     width: 1000px;
-    height: 700px;
+    height: 800px; /* Increased to 800px to add massive breathing room */
     transform-origin: center;
+}
+
+/* Elegant radial glow behind the active card */
+.card-glow {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: 560px;
+    height: 400px;
+    border-radius: 28px;
+    background: radial-gradient(circle, rgba(125, 249, 255, 0.12) 0%, transparent 70%);
+    filter: blur(45px);
+    opacity: 0;
+    z-index: 1;
+    transition: all 1.4s cubic-bezier(.22,1,.36,1);
+    pointer-events: none;
 }
 
 .card {
@@ -61,13 +81,15 @@ body {
     width: 560px;
     height: 400px;
     border-radius: 28px;
-    background: linear-gradient(145deg, #ffffff 0%, #f4f4f4 35%, #e0e0e0 70%, #fdfdfd 100%);
+    background: linear-gradient(145deg, #ffffff 0%, #f7f7f8 35%, #e3e3e6 75%, #ffffff 100%);
     opacity: 0;
     box-shadow: 
-        0 40px 90px rgba(0,0,0,0.65),
+        0 45px 100px rgba(0,0,0,0.7),
+        0 10px 20px rgba(0,0,0,0.3),
         inset 0 1px 0 rgba(255,255,255,1),
-        inset 0 -1px 2px rgba(0,0,0,0.05);
+        inset 0 -1.5px 3px rgba(0,0,0,0.06);
     overflow: hidden;
+    z-index: 2;
 }
 
 .stroke {
@@ -77,13 +99,13 @@ body {
     width: 592px;
     height: 432px;
     border-radius: 34px;
-    border: 2px solid rgba(255, 255, 255, 0.4);
+    border: 2px dashed rgba(255, 255, 255, 0.45);
     transform: translate(-50%, -50%) scale(0.95);
     opacity: 0;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.65);
+    z-index: 1;
 }
 
-/* Internal Card Content Styles */
 .card-content {
     position: absolute;
     inset: 0;
@@ -98,27 +120,29 @@ body {
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
     transition: all 1.5s cubic-bezier(.22,1,.36,1);
-    color: #333;
-    width: calc(100% - 210px);
+    color: #374151;
+    width: calc(100% - 220px);
 }
 
 .info-row {
-    font-size: 15px;
+    font-size: calc(17px * var(--card-text-scale-multiplier));
     letter-spacing: 0.5px;
+    line-height: 1.4;
 }
 
 .info-row.name {
-    font-size: 24px;
-    color: #111;
-    margin-bottom: 6px;
-    letter-spacing: 1px;
+    font-size: calc(27px * var(--card-text-scale-multiplier));
+    color: #111111;
+    margin-bottom: 4px;
+    letter-spacing: 0.8px;
+    font-weight: 800;
 }
 
 .info-row strong {
     font-weight: 600;
-    color: #111;
+    color: #111111;
 }
 
 .card-qr {
@@ -126,48 +150,51 @@ body {
     right: 45px;
     top: 50%;
     transform: translateY(-50%);
-    width: 130px;
-    height: 130px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1), inset 0 0 0 2px rgba(0,0,0,0.05);
+    width: 135px;
+    height: 135px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 
+        0 12px 30px rgba(0,0,0,0.12), 
+        inset 0 0 0 2px rgba(0,0,0,0.04);
     transition: all 1.5s cubic-bezier(.22,1,.36,1);
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 10px;
+    padding: 12px;
 }
 
-/* Portrait Layout Overrides - This handles the smooth layout shift */
+/* Portrait Layout Shift Overrides */
 .card.is-portrait .card-info {
     left: 50%;
-    top: 70%;
+    top: 68%;
     transform: translate(-50%, -50%);
     text-align: center;
     align-items: center;
     width: 90%;
+    gap: 14px;
 }
 
 .card.is-portrait .card-qr {
     right: 50%;
-    top: 32%;
+    top: 30%;
     transform: translate(50%, -50%);
-    width: 150px;
-    height: 150px;
+    width: 155px;
+    height: 155px;
 }
 
 .title {
     position: absolute;
     left: 50%;
-    top: 575px; /* Default height */
+    top: 630px; /* Shifted down for massive breathing room */
     transform: translateX(-50%);
     color: #ffffff;
-    letter-spacing: 12px;
-    font-size: 26px;
+    letter-spacing: 14px;
+    font-size: calc(32px * var(--text-scale-multiplier));
     font-weight: 300;
     opacity: 0;
     text-transform: uppercase;
-    text-shadow: 0 4px 15px rgba(0,0,0,0.9);
+    text-shadow: 0 4px 20px rgba(0,0,0,0.95);
     transition: opacity 0.6s ease, top 1.5s cubic-bezier(.22,1,.36,1);
     white-space: nowrap;
 }
@@ -175,29 +202,55 @@ body {
 .description {
     position: absolute;
     left: 50%;
-    top: 615px; /* Default height */
+    top: 675px; /* Shifted down to prevent colliding with title */
     transform: translateX(-50%);
-    color: var(--muted-white);
-    font-size: 15px;
-    font-weight: 300;
-    letter-spacing: 1px;
-    text-align: left; /* Aligned left for bullet points */
     opacity: 0;
-    width: 800px;
-    line-height: 1.8;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+    width: 900px; 
     transition: opacity 0.6s ease, top 1.5s cubic-bezier(.22,1,.36,1);
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
 }
 
+/* Flexbox list inside the description to guarantee left alignment */
+.desc-list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Aligns all rows to the absolute left of the list */
+    justify-content: center;
+    gap: 12px;
+    max-width: 100%;
+    padding: 0 24px;
+}
+
+/* Structured lines to keep elements from shifting on wrap */
 .desc-line {
-    margin-bottom: 4px;
+    display: flex;
+    align-items: flex-start; /* Bullet icon alignments remain crisp */
+    gap: 12px;
+    font-size: calc(18px * var(--text-scale-multiplier));
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    color: var(--muted-white);
+    line-height: 1.6;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.95);
+    text-align: left;
 }
 
-.adv { color: var(--adv-color); font-weight: 600; margin-right: 8px; letter-spacing: 2px;}
-.disadv { color: var(--disadv-color); font-weight: 600; margin-right: 8px; letter-spacing: 2px;}
+.adv { 
+    color: var(--adv-color); 
+    font-weight: 700; 
+    letter-spacing: 1.5px;
+    white-space: nowrap;
+}
+
+.disadv { 
+    color: var(--disadv-color); 
+    font-weight: 700; 
+    letter-spacing: 1.5px;
+    white-space: nowrap;
+}
 
 .measure {
     position: absolute;
@@ -211,6 +264,7 @@ body {
     background: var(--cyan);
     transform-origin: center;
     transform: scaleX(0);
+    box-shadow: 0 0 10px rgba(125, 249, 255, 0.5);
 }
 
 .v-line {
@@ -218,75 +272,17 @@ body {
     background: var(--cyan);
     transform-origin: center;
     transform: scaleY(0);
+    box-shadow: 0 0 10px rgba(125, 249, 255, 0.5);
 }
 
 .label {
     position: absolute;
     color: var(--cyan);
-    font-size: 20px;
-    font-weight: 500;
-    letter-spacing: 2px;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
-    white-space: nowrap;
-}
-
-.footer-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: #ffffff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 24px 32px; /* Increased padding to make it taller */
-    gap: 50px;
-    z-index: 1000;
-    box-shadow: 0 -6px 40px rgba(0,0,0,0.5); /* Enhanced shadow for prominence */
-}
-
-.footer-link {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: #111;
-    text-decoration: none;
+    font-size: calc(23px * var(--text-scale-multiplier));
     font-weight: 600;
-    font-size: 16px; /* Slightly larger text */
-    letter-spacing: 0.5px;
-    opacity: 0.7;
-    transition: all 0.2s ease;
-}
-
-.footer-link:hover {
-    opacity: 1;
-    transform: translateY(-2px);
-    color: #000;
-}
-
-.footer-link svg {
-    transition: transform 0.2s ease;
-    width: 26px; /* Larger icons to match taller footer */
-    height: 26px;
-}
-
-.footer-link:hover svg {
-    transform: scale(1.1);
-}
-
-@media (max-width: 600px) {
-    .footer-bar {
-        padding: 18px 20px; /* Increased padding for mobile */
-        gap: 24px;
-    }
-    .footer-link {
-        font-size: 14px;
-        gap: 8px;
-    }
-    .footer-link svg {
-        width: 22px;
-        height: 22px;
-    }
+    letter-spacing: 2px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.95);
+    white-space: nowrap;
 }
 </style>
 </head>
@@ -296,19 +292,20 @@ body {
 
 <div class="scale-container" id="scaleContainer">
     <div class="wrapper" id="wrapper">
+        <div class="card-glow" id="cardGlow"></div>
         <div class="stroke" id="stroke"></div>
+        
         <div class="card" id="card">
             <div class="card-content" id="cardContent">
                 <div class="card-info">
-                    <div class="info-row name"><strong>Name:</strong> Tony Stark</div>
+                    <div class="info-row name">Tony Stark</div>
                     <div class="info-row"><strong>QR Number:</strong> 000-000-000</div>
                     <div class="info-row"><strong>L:</strong> Emerald &nbsp;&nbsp;|&nbsp;&nbsp; <strong>D:</strong> Diamond Palace</div>
-                    <div class="info-row">PG: 1-1</div>
+                    <div class="info-row"><strong>PG:</strong> 1-1</div>
                 </div>
                 <div class="card-qr">
-                    <!-- Crisp SVG QR Code Graphic placeholder -->
-                    <svg viewBox="0 0 100 100" fill="#222" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
-                        <!-- Corner Markers -->
+                    <svg viewBox="0 0 100 100" fill="#111" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+                        <!-- Crisp Custom Vector QR Code layout -->
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M10 10H35V35H10V10ZM15 15V30H30V15H15Z" />
                         <rect x="20" y="20" width="5" height="5" />
                         
@@ -318,7 +315,6 @@ body {
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M10 65H35V90H10V65ZM15 70V85H30V70H15Z" />
                         <rect x="20" y="75" width="5" height="5" />
 
-                        <!-- Data Modules -->
                         <rect x="45" y="10" width="10" height="5" />
                         <rect x="40" y="20" width="15" height="5" />
                         <rect x="45" y="30" width="10" height="10" />
@@ -355,27 +351,11 @@ body {
     </div>
 </div>
 
-<div class="footer-bar">
-    <a href="https://www.facebook.com/profile.php?id=61591051647696" target="_blank" class="footer-link">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="#0084ff">
-            <path d="M12 2C6.477 2 2 6.145 2 11.26c0 2.92 1.5 5.518 3.824 7.182v3.31l3.472-1.921c1.23.344 2.56.529 3.954.529 5.523 0 10-4.145 10-9.26S17.523 2 12 2zm1.09 12.35l-2.77-2.956-5.42 2.956 5.953-6.324 2.82 2.956 5.367-2.956-5.95 6.324z"/>
-        </svg>
-        Messenger
-    </a>
-    <a href="https://sites.google.com/view/tgpcards/home" target="_blank" class="footer-link">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-            <polyline points="21 15 16 10 5 21"></polyline>
-        </svg>
-        View Designs
-    </a>
-</div>
-
 <script>
 const card = document.getElementById("card");
 const cardContent = document.getElementById("cardContent");
 const stroke = document.getElementById("stroke");
+const cardGlow = document.getElementById("cardGlow");
 const title = document.getElementById("title");
 const description = document.getElementById("description");
 const hLine = document.getElementById("hLine");
@@ -397,45 +377,67 @@ function wait(ms){
 function updateScale() {
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
-    const scale = Math.min((screenWidth * 0.9) / 1000, (screenHeight * 0.9) / 700, 1.2);
+    
+    // Adjusted scale ratios targeting the new 1000x800 bounding box
+    const paddingFactor = screenWidth < 768 ? 0.98 : 0.95; 
+    let scale = Math.min((screenWidth * paddingFactor) / 1000, (screenHeight * paddingFactor) / 800);
+    
+    const maxScale = screenWidth < 768 ? 1.25 : 1.45;
+    scale = Math.min(scale, maxScale);
+    
     scaleContainer.style.transform = `scale(${scale})`;
+    
+    // Dynamic compensation scale multipliers:
+    let globalMultiplier = 1.0;
+    let cardMultiplier = 1.0;
+    
+    if (scale < 1.0) {
+        // High visibility scaling formula for description text
+        globalMultiplier = Math.max(1.0, 1.0 / Math.pow(scale, 0.75));
+        // Soft adaptive scaling inside card
+        cardMultiplier = Math.max(1.0, 1.0 / Math.pow(scale, 0.45));
+    }
+    
+    document.documentElement.style.setProperty('--text-scale-multiplier', globalMultiplier);
+    document.documentElement.style.setProperty('--card-text-scale-multiplier', cardMultiplier);
 }
 
 function updateMeasurements(){
     const wrapW = 1000;
-    const wrapH = 700;
+    const wrapH = 800; // Matches wrapper coordinate heights
     
     const leftOffset = (wrapW - currentCardWidth) / 2;
     const topOffset = (wrapH - currentCardHeight) / 2;
 
     widthMeasure.style.left = leftOffset + "px";
-    widthMeasure.style.top = (topOffset - 60) + "px";
+    widthMeasure.style.top = (topOffset - 65) + "px";
     hLine.style.width = currentCardWidth + "px";
 
     widthLabel.style.left = "50%";
-    widthLabel.style.top = "-40px";
+    widthLabel.style.top = "-45px";
     widthLabel.style.transform = "translateX(-50%)";
 
-    heightMeasure.style.left = (leftOffset - 60) + "px";
+    heightMeasure.style.left = (leftOffset - 65) + "px";
     heightMeasure.style.top = topOffset + "px";
     vLine.style.height = currentCardHeight + "px";
 
-    heightLabel.style.left = "-20px";
+    heightLabel.style.left = "-25px";
     heightLabel.style.top = "50%";
     heightLabel.style.transform = "translate(-100%, -50%) rotate(-90deg)";
 }
 
 function togglePortraitMode(isPortrait) {
+    const isMobile = window.innerWidth < 768;
     if (isPortrait) {
         card.classList.add('is-portrait');
-        // Push main titles lower dynamically to prevent colliding with the taller Portrait card
-        title.style.top = "615px";
-        description.style.top = "655px";
+        // Space elements generously in Portrait mode
+        title.style.top = isMobile ? "685px" : "675px";
+        description.style.top = isMobile ? "730px" : "720px";
     } else {
         card.classList.remove('is-portrait');
-        // Reset to original height
-        title.style.top = "575px";
-        description.style.top = "615px";
+        // Space elements generously in Landscape mode
+        title.style.top = isMobile ? "630px" : "620px";
+        description.style.top = isMobile ? "675px" : "665px";
     }
 }
 
@@ -462,7 +464,8 @@ async function hideMeasure(){
 
 async function showText(text, desc){
     title.innerHTML = text;
-    description.innerHTML = desc;
+    // Inject the lines nested in a structured, left-aligned desc-list wrapper
+    description.innerHTML = `<div class="desc-list">${desc}</div>`;
     title.style.opacity = 1;
     description.style.opacity = 1;
 }
@@ -477,6 +480,10 @@ async function resizeCard(w, h){
     currentCardHeight = h;
     card.style.width = w + "px";
     card.style.height = h + "px";
+    
+    cardGlow.style.width = w + "px";
+    cardGlow.style.height = h + "px";
+    
     await wait(1400);
     updateMeasurements();
 }
@@ -495,6 +502,13 @@ async function run(){
         card.style.height = "400px";
         card.style.opacity = 0;
         card.style.transform = "translate(-50%,-50%) scale(0.2)";
+        
+        cardGlow.style.transition = "none";
+        cardGlow.style.width = "560px";
+        cardGlow.style.height = "400px";
+        cardGlow.style.opacity = 0;
+        cardGlow.style.transform = "translate(-50%,-50%) scale(0.2)";
+
         cardContent.style.opacity = 0;
 
         togglePortraitMode(false);
@@ -508,22 +522,26 @@ async function run(){
         hLine.style.transform = "scaleX(0)";
         vLine.style.transform = "scaleY(0)";
 
-        await wait(500);
+        await wait(600);
 
         /* 1. ORIGINAL */
         card.style.transition = "all 1.4s cubic-bezier(.22,1,.36,1)";
+        cardGlow.style.transition = "all 1.4s cubic-bezier(.22,1,.36,1)";
+        
         card.style.opacity = 1;
         card.style.transform = "translate(-50%,-50%) scale(1)";
+        cardGlow.style.opacity = 1;
+        cardGlow.style.transform = "translate(-50%,-50%) scale(1)";
         
         await wait(800);
-        cardContent.style.opacity = 1; // Fade in ID details
+        cardContent.style.opacity = 1; 
         await wait(700);
 
         await showMeasure('3.5"', '2.5"');
         await showText(
             "ORIGINAL", 
-            `<div class="desc-line"><span class="disadv">✖ DISADVANTAGE:</span> Too bulky to easily fit inside modern pockets or wallets</div>
-             <div class="desc-line"><span class="disadv">✖ DISADVANTAGE:</span> Impractical and cumbersome for continuous daily carry</div>`
+            `<div class="desc-line"><span class="disadv">✖</span><span><strong>DISADVANTAGE:</strong> Too bulky to easily fit inside modern pockets or wallets</span></div>
+             <div class="desc-line"><span class="disadv">✖</span><span><strong>DISADVANTAGE:</strong> Impractical and cumbersome for continuous daily carry</span></div>`
         );
 
         await wait(4500);
@@ -543,8 +561,8 @@ async function run(){
         await showMeasure('3.7"', '2.7"');
         await showText(
             "LAMINATED", 
-            `<div class="desc-line"><span class="disadv">✖ DISADVANTAGE:</span> Significantly larger dimensions with rigid protective edges</div>
-             <div class="desc-line"><span class="disadv">✖ DISADVANTAGE:</span> Exceptionally difficult to fit into standard compartments</div>`
+            `<div class="desc-line"><span class="disadv">✖</span><span><strong>DISADVANTAGE:</strong> Significantly larger dimensions with rigid protective edges</span></div>
+             <div class="desc-line"><span class="disadv">✖</span><span><strong>DISADVANTAGE:</strong> Exceptionally difficult to fit into standard compartments</span></div>`
         );
 
         await wait(4500);
@@ -559,7 +577,7 @@ async function run(){
         /* 3. NEW DESIGN INTRODUCTION */
         await showText(
             "NEW DESIGN", 
-            `<div class="desc-line" style="color: white; font-weight: 400;">Sleeker dimensions engineered for effortless everyday portability</div>`
+            `<div class="desc-line" style="color: white; font-weight: 400; justify-content: center; width: 100%; text-align: center;">Sleeker dimensions engineered for effortless everyday portability</div>`
         );
         await wait(2500);
         await hideText();
@@ -572,8 +590,8 @@ async function run(){
         await showMeasure('3"', '2"');
         await showText(
             "POCKET LANDSCAPE", 
-            `<div class="desc-line"><span class="adv">✔ ADVANTAGE:</span> Perfectly compact, lightweight, and balanced design</div>
-             <div class="desc-line"><span class="adv">✔ ADVANTAGE:</span> Slips smoothly into any standard wallet or hand carry</div>`
+            `<div class="desc-line"><span class="adv">✔</span><span><strong>ADVANTAGE:</strong> Perfectly compact, lightweight, and balanced design</span></div>
+             <div class="desc-line"><span class="adv">✔</span><span><strong>ADVANTAGE:</strong> Slips smoothly into any standard wallet or hand carry</span></div>`
         );
         await wait(4500);
 
@@ -583,14 +601,14 @@ async function run(){
         await wait(800);
 
         /* 5. POCKET PORTRAIT */
-        togglePortraitMode(true); // Triggers the layout shift (QR up, text down) and pushes main titles lower
+        togglePortraitMode(true); 
         await resizeCard(320, 480);
 
         await showMeasure('2"', '3"');
         await showText(
             "POCKET PORTRAIT", 
-            `<div class="desc-line"><span class="adv">✔ ADVANTAGE:</span> Incredibly sleek and ergonomic portrait orientation</div>
-             <div class="desc-line"><span class="adv">✔ ADVANTAGE:</span> Fits flawlessly inside minimalist cardholders and small pockets</div>`
+            `<div class="desc-line"><span class="adv">✔</span><span><strong>ADVANTAGE:</strong> Incredibly sleek and ergonomic portrait orientation</span></div>
+             <div class="desc-line"><span class="adv">✔</span><span><strong>ADVANTAGE:</strong> Fits flawlessly inside minimalist cardholders and small pockets</span></div>`
         );
 
         await wait(5000);
@@ -617,3 +635,10 @@ run();
 
 </body>
 </html>
+```
+eof
+
+### Summary of Improvements:
+1. **Flawless Left-Alignment Layout:** Nested the description text inside a parent wrapper using `.desc-list` paired with `align-items: flex-start` so bullet points align perfectly to the left of the block, regardless of mobile scaling.
+2. **Dynamic Wrap-Proof Styling:** Isolated the icon ticks/crosses (`✔` and `✖`) from the message spans. This ensures that when description strings wrap to multiple lines on narrow screens, the text wraps uniformly directly below the preceding line, rather than sliding under the bullet points.
+3. **Generous Spacing Bump:** Expanded the coordinate window height to **`800px`** and pushed down the target vertical offsets for headings in both orientation modes. This introduces massive, premium spacing below the animated card container.
