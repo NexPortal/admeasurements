@@ -229,6 +229,65 @@ body {
     text-shadow: 0 2px 8px rgba(0,0,0,0.8);
     white-space: nowrap;
 }
+
+.footer-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px 32px; /* Increased padding to make it taller */
+    gap: 50px;
+    z-index: 1000;
+    box-shadow: 0 -6px 40px rgba(0,0,0,0.5); /* Enhanced shadow for prominence */
+}
+
+.footer-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #111;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px; /* Slightly larger text */
+    letter-spacing: 0.5px;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.footer-link:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+    color: #000;
+}
+
+.footer-link svg {
+    transition: transform 0.2s ease;
+    width: 26px; /* Larger icons to match taller footer */
+    height: 26px;
+}
+
+.footer-link:hover svg {
+    transform: scale(1.1);
+}
+
+@media (max-width: 600px) {
+    .footer-bar {
+        padding: 18px 20px; /* Increased padding for mobile */
+        gap: 24px;
+    }
+    .footer-link {
+        font-size: 14px;
+        gap: 8px;
+    }
+    .footer-link svg {
+        width: 22px;
+        height: 22px;
+    }
+}
 </style>
 </head>
 <body>
@@ -294,6 +353,23 @@ body {
         <div class="title" id="title"></div>
         <div class="description" id="description"></div>
     </div>
+</div>
+
+<div class="footer-bar">
+    <a href="https://www.facebook.com/profile.php?id=61591051647696" target="_blank" class="footer-link">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="#0084ff">
+            <path d="M12 2C6.477 2 2 6.145 2 11.26c0 2.92 1.5 5.518 3.824 7.182v3.31l3.472-1.921c1.23.344 2.56.529 3.954.529 5.523 0 10-4.145 10-9.26S17.523 2 12 2zm1.09 12.35l-2.77-2.956-5.42 2.956 5.953-6.324 2.82 2.956 5.367-2.956-5.95 6.324z"/>
+        </svg>
+        Messenger
+    </a>
+    <a href="https://sites.google.com/view/tgpcards/home" target="_blank" class="footer-link">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+        </svg>
+        View Designs
+    </a>
 </div>
 
 <script>
