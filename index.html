@@ -52,7 +52,7 @@ body {
 .wrapper {
     position: relative;
     width: 1000px;
-    height: 800px; /* Increased to 800px to add massive breathing room */
+    height: 850px; /* Increased height to provide elegant spacing below the card */
     transform-origin: center;
 }
 
@@ -183,73 +183,67 @@ body {
     height: 155px;
 }
 
-.title {
+/* Centered Unified Typography Block Container */
+.text-group {
     position: absolute;
     left: 50%;
-    top: 630px; /* Shifted down for massive breathing room */
     transform: translateX(-50%);
+    width: 650px;
+    max-width: 92%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Perfectly left-aligned internal layout */
+    gap: 16px; /* Space between Title and Text Info */
+    transition: top 1.5s cubic-bezier(.22,1,.36,1);
+    z-index: 15;
+}
+
+.title {
     color: #ffffff;
-    letter-spacing: 14px;
-    font-size: calc(32px * var(--text-scale-multiplier));
+    letter-spacing: 10px;
+    font-size: calc(30px * var(--text-scale-multiplier));
     font-weight: 300;
     opacity: 0;
     text-transform: uppercase;
     text-shadow: 0 4px 20px rgba(0,0,0,0.95);
-    transition: opacity 0.6s ease, top 1.5s cubic-bezier(.22,1,.36,1);
+    transition: opacity 0.6s ease;
     white-space: nowrap;
+    text-align: left;
 }
 
 .description {
-    position: absolute;
-    left: 50%;
-    top: 675px; /* Shifted down to prevent colliding with title */
-    transform: translateX(-50%);
-    opacity: 0;
-    width: 900px; 
-    transition: opacity 0.6s ease, top 1.5s cubic-bezier(.22,1,.36,1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Flexbox list inside the description to guarantee left alignment */
-.desc-list {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* Aligns all rows to the absolute left of the list */
-    justify-content: center;
-    gap: 12px;
-    max-width: 100%;
-    padding: 0 24px;
-}
-
-/* Structured lines to keep elements from shifting on wrap */
-.desc-line {
-    display: flex;
-    align-items: flex-start; /* Bullet icon alignments remain crisp */
-    gap: 12px;
-    font-size: calc(18px * var(--text-scale-multiplier));
+    color: var(--muted-white);
+    font-size: calc(17px * var(--text-scale-multiplier));
     font-weight: 300;
     letter-spacing: 0.5px;
-    color: var(--muted-white);
+    opacity: 0;
+    width: 100%;
     line-height: 1.6;
     text-shadow: 0 2px 12px rgba(0,0,0,0.95);
+    transition: opacity 0.6s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Keeps multi-line notes structurally left-aligned */
+    gap: 10px;
+}
+
+.desc-line {
+    margin-bottom: 0px;
     text-align: left;
 }
 
 .adv { 
     color: var(--adv-color); 
     font-weight: 700; 
+    margin-right: 6px; 
     letter-spacing: 1.5px;
-    white-space: nowrap;
 }
 
 .disadv { 
     color: var(--disadv-color); 
     font-weight: 700; 
+    margin-right: 6px; 
     letter-spacing: 1.5px;
-    white-space: nowrap;
 }
 
 .measure {
@@ -305,7 +299,6 @@ body {
                 </div>
                 <div class="card-qr">
                     <svg viewBox="0 0 100 100" fill="#111" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
-                        <!-- Crisp Custom Vector QR Code layout -->
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M10 10H35V35H10V10ZM15 15V30H30V15H15Z" />
                         <rect x="20" y="20" width="5" height="5" />
                         
@@ -346,8 +339,11 @@ body {
             <div class="label" id="heightLabel"></div>
         </div>
 
-        <div class="title" id="title"></div>
-        <div class="description" id="description"></div>
+        <!-- Integrated Text Group Wrapper -->
+        <div class="text-group" id="textGroup">
+            <div class="title" id="title"></div>
+            <div class="description" id="description"></div>
+        </div>
     </div>
 </div>
 
@@ -356,6 +352,7 @@ const card = document.getElementById("card");
 const cardContent = document.getElementById("cardContent");
 const stroke = document.getElementById("stroke");
 const cardGlow = document.getElementById("cardGlow");
+const textGroup = document.getElementById("textGroup");
 const title = document.getElementById("title");
 const description = document.getElementById("description");
 const hLine = document.getElementById("hLine");
@@ -378,23 +375,19 @@ function updateScale() {
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
     
-    // Adjusted scale ratios targeting the new 1000x800 bounding box
     const paddingFactor = screenWidth < 768 ? 0.98 : 0.95; 
-    let scale = Math.min((screenWidth * paddingFactor) / 1000, (screenHeight * paddingFactor) / 800);
+    let scale = Math.min((screenWidth * paddingFactor) / 1000, (screenHeight * paddingFactor) / 850);
     
     const maxScale = screenWidth < 768 ? 1.25 : 1.45;
     scale = Math.min(scale, maxScale);
     
     scaleContainer.style.transform = `scale(${scale})`;
     
-    // Dynamic compensation scale multipliers:
     let globalMultiplier = 1.0;
     let cardMultiplier = 1.0;
     
     if (scale < 1.0) {
-        // High visibility scaling formula for description text
         globalMultiplier = Math.max(1.0, 1.0 / Math.pow(scale, 0.75));
-        // Soft adaptive scaling inside card
         cardMultiplier = Math.max(1.0, 1.0 / Math.pow(scale, 0.45));
     }
     
@@ -404,7 +397,7 @@ function updateScale() {
 
 function updateMeasurements(){
     const wrapW = 1000;
-    const wrapH = 800; // Matches wrapper coordinate heights
+    const wrapH = 850;
     
     const leftOffset = (wrapW - currentCardWidth) / 2;
     const topOffset = (wrapH - currentCardHeight) / 2;
@@ -430,14 +423,11 @@ function togglePortraitMode(isPortrait) {
     const isMobile = window.innerWidth < 768;
     if (isPortrait) {
         card.classList.add('is-portrait');
-        // Space elements generously in Portrait mode
-        title.style.top = isMobile ? "685px" : "675px";
-        description.style.top = isMobile ? "730px" : "720px";
+        // Elegant spacing coordinates away from bounding layout box limits
+        textGroup.style.top = isMobile ? "710px" : "695px";
     } else {
         card.classList.remove('is-portrait');
-        // Space elements generously in Landscape mode
-        title.style.top = isMobile ? "630px" : "620px";
-        description.style.top = isMobile ? "675px" : "665px";
+        textGroup.style.top = isMobile ? "670px" : "655px";
     }
 }
 
@@ -464,8 +454,7 @@ async function hideMeasure(){
 
 async function showText(text, desc){
     title.innerHTML = text;
-    // Inject the lines nested in a structured, left-aligned desc-list wrapper
-    description.innerHTML = `<div class="desc-list">${desc}</div>`;
+    description.innerHTML = desc;
     title.style.opacity = 1;
     description.style.opacity = 1;
 }
@@ -540,8 +529,8 @@ async function run(){
         await showMeasure('3.5"', '2.5"');
         await showText(
             "ORIGINAL", 
-            `<div class="desc-line"><span class="disadv">✖</span><span><strong>DISADVANTAGE:</strong> Too bulky to easily fit inside modern pockets or wallets</span></div>
-             <div class="desc-line"><span class="disadv">✖</span><span><strong>DISADVANTAGE:</strong> Impractical and cumbersome for continuous daily carry</span></div>`
+            `<div class="desc-line"><span class="disadv">✖ DISADVANTAGE:</span> Too bulky to easily fit inside modern pockets or wallets</div>
+             <div class="desc-line"><span class="disadv">✖ DISADVANTAGE:</span> Impractical and cumbersome for continuous daily carry</div>`
         );
 
         await wait(4500);
@@ -561,8 +550,8 @@ async function run(){
         await showMeasure('3.7"', '2.7"');
         await showText(
             "LAMINATED", 
-            `<div class="desc-line"><span class="disadv">✖</span><span><strong>DISADVANTAGE:</strong> Significantly larger dimensions with rigid protective edges</span></div>
-             <div class="desc-line"><span class="disadv">✖</span><span><strong>DISADVANTAGE:</strong> Exceptionally difficult to fit into standard compartments</span></div>`
+            `<div class="desc-line"><span class="disadv">✖ DISADVANTAGE:</span> Significantly larger dimensions with rigid protective edges</div>
+             <div class="desc-line"><span class="disadv">✖ DISADVANTAGE:</span> Exceptionally difficult to fit into standard compartments</div>`
         );
 
         await wait(4500);
@@ -577,7 +566,7 @@ async function run(){
         /* 3. NEW DESIGN INTRODUCTION */
         await showText(
             "NEW DESIGN", 
-            `<div class="desc-line" style="color: white; font-weight: 400; justify-content: center; width: 100%; text-align: center;">Sleeker dimensions engineered for effortless everyday portability</div>`
+            `<div class="desc-line" style="color: white; font-weight: 400;">Sleeker dimensions engineered for effortless everyday portability</div>`
         );
         await wait(2500);
         await hideText();
@@ -590,8 +579,8 @@ async function run(){
         await showMeasure('3"', '2"');
         await showText(
             "POCKET LANDSCAPE", 
-            `<div class="desc-line"><span class="adv">✔</span><span><strong>ADVANTAGE:</strong> Perfectly compact, lightweight, and balanced design</span></div>
-             <div class="desc-line"><span class="adv">✔</span><span><strong>ADVANTAGE:</strong> Slips smoothly into any standard wallet or hand carry</span></div>`
+            `<div class="desc-line"><span class="adv">✔ ADVANTAGE:</span> Perfectly compact, lightweight, and balanced design</div>
+             <div class="desc-line"><span class="adv">✔ ADVANTAGE:</span> Slips smoothly into any standard wallet or hand carry</div>`
         );
         await wait(4500);
 
@@ -607,8 +596,8 @@ async function run(){
         await showMeasure('2"', '3"');
         await showText(
             "POCKET PORTRAIT", 
-            `<div class="desc-line"><span class="adv">✔</span><span><strong>ADVANTAGE:</strong> Incredibly sleek and ergonomic portrait orientation</span></div>
-             <div class="desc-line"><span class="adv">✔</span><span><strong>ADVANTAGE:</strong> Fits flawlessly inside minimalist cardholders and small pockets</span></div>`
+            `<div class="desc-line"><span class="adv">✔ ADVANTAGE:</span> Incredibly sleek and ergonomic portrait orientation</div>
+             <div class="desc-line"><span class="adv">✔ ADVANTAGE:</span> Fits flawlessly inside minimalist cardholders and small pockets</div>`
         );
 
         await wait(5000);
@@ -635,10 +624,3 @@ run();
 
 </body>
 </html>
-```
-eof
-
-### Summary of Improvements:
-1. **Flawless Left-Alignment Layout:** Nested the description text inside a parent wrapper using `.desc-list` paired with `align-items: flex-start` so bullet points align perfectly to the left of the block, regardless of mobile scaling.
-2. **Dynamic Wrap-Proof Styling:** Isolated the icon ticks/crosses (`✔` and `✖`) from the message spans. This ensures that when description strings wrap to multiple lines on narrow screens, the text wraps uniformly directly below the preceding line, rather than sliding under the bullet points.
-3. **Generous Spacing Bump:** Expanded the coordinate window height to **`800px`** and pushed down the target vertical offsets for headings in both orientation modes. This introduces massive, premium spacing below the animated card container.
