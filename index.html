@@ -11,6 +11,7 @@
     --muted-white: rgba(255, 255, 255, 0.7);
     --adv-color: #4ade80;
     --disadv-color: #f87171;
+    --red-brand: #ff3333;
 }
 
 * {
@@ -30,12 +31,81 @@ body {
     align-items: center;
 }
 
+/* Global Top Brand Text */
+.global-brand {
+    position: fixed;
+    top: 35px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    z-index: 1001;
+    text-shadow: 0 4px 15px rgba(0,0,0,0.8);
+    pointer-events: none;
+}
+
+.global-brand .red-text { color: var(--red-brand); }
+.global-brand .white-text { color: #ffffff; }
+
 .vignette {
     position: absolute;
     inset: 0;
     pointer-events: none;
     background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.5) 80%, rgba(0,0,0,0.9) 100%);
     z-index: 10;
+}
+
+/* Intermezzo Overlay Text */
+.intermezzo {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+.inter-content {
+    position: relative;
+    z-index: 501;
+    text-align: center;
+    opacity: 0;
+}
+
+.inter-content.epic-anim {
+    animation: epicSequence 3s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes epicSequence {
+    0% { transform: scale(0.4); opacity: 0; filter: blur(15px); }
+    20% { transform: scale(0.85); opacity: 1; filter: blur(0px); }
+    80% { transform: scale(0.95); opacity: 1; filter: blur(0px); }
+    100% { transform: scale(1.4); opacity: 0; filter: blur(12px); }
+}
+
+.inter-title {
+    font-size: 52px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    text-shadow: 0 5px 25px rgba(0,0,0,0.9);
+}
+.inter-title .red-text { color: var(--red-brand); }
+.inter-title .white-text { color: #ffffff; }
+
+.inter-subtitle {
+    color: #e0e0e0;
+    font-size: 18px;
+    font-weight: 300;
+    letter-spacing: 10px;
+    margin-top: 15px;
+    text-transform: uppercase;
+    text-shadow: 0 3px 15px rgba(0,0,0,0.9);
 }
 
 .scale-container {
@@ -45,7 +115,7 @@ body {
     transform-origin: center center;
     transition: transform 0.2s ease-out;
     position: relative;
-    top: -15vh; /* Shifted even higher to provide more space below */
+    top: -15vh;
 }
 
 .wrapper {
@@ -288,12 +358,29 @@ body {
         width: 22px;
         height: 22px;
     }
+    .inter-title { font-size: 48px; }
+    .inter-subtitle { font-size: 16px; }
 }
 </style>
 </head>
 <body>
 
+<!-- Global Top Header per request -->
+<div class="global-brand">
+    <span class="red-text">Red</span> <span class="white-text">Design</span>
+</div>
+
 <div class="vignette"></div>
+
+<!-- Intermezzo Overlay Sequence -->
+<div class="intermezzo" id="intermezzo">
+    <div class="inter-content" id="interContent">
+        <div class="inter-title">
+            <span class="red-text">Red</span> <span class="white-text">Design</span>
+        </div>
+        <div class="inter-subtitle">Pocket Size adjust</div>
+    </div>
+</div>
 
 <div class="scale-container" id="scaleContainer">
     <div class="wrapper" id="wrapper">
@@ -397,13 +484,9 @@ function updateScale() {
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
     
-    // Default desktop scale
     let scale = Math.min((screenWidth * 0.95) / 1000, (screenHeight * 0.80) / 1000, 1.2);
     
-    // Zoom in dramatically for mobile screens safely
     if (screenWidth <= 600) {
-        // By targeting our safe text width (860px) instead of the full wrapper (1000px),
-        // we can maximize the zoom size without ever cropping the left and right text!
         scale = Math.min((screenWidth * 0.95) / 860, (screenHeight * 0.80) / 1000);
     }
     
@@ -412,7 +495,7 @@ function updateScale() {
 
 function updateMeasurements(){
     const wrapW = 1000;
-    const wrapH = 1000; // Updated to match our 1000px square wrapper
+    const wrapH = 1000;
     
     const leftOffset = (wrapW - currentCardWidth) / 2;
     const topOffset = (wrapH - currentCardHeight) / 2;
@@ -437,12 +520,10 @@ function updateMeasurements(){
 function togglePortraitMode(isPortrait) {
     if (isPortrait) {
         card.classList.add('is-portrait');
-        // Push even further down since the card is taller, preserving the spaces
         title.style.top = "800px";
         description.style.top = "860px";
     } else {
         card.classList.remove('is-portrait');
-        // Standard extreme spacing: Box [space space] Title [space] Description
         title.style.top = "760px";
         description.style.top = "820px";
     }
@@ -489,6 +570,25 @@ async function resizeCard(w, h){
     await wait(1400);
     updateMeasurements();
 }
+
+// Epic 3-Second Cinematic Text Animation
+function triggerEpicText() {
+    return new Promise(resolve => {
+        const intermezzo = document.getElementById('intermezzo');
+        const interContent = document.getElementById('interContent');
+        
+        intermezzo.style.opacity = 1;
+        interContent.classList.remove('epic-anim');
+        void interContent.offsetWidth; // trigger DOM reflow to restart CSS animation
+        interContent.classList.add('epic-anim');
+
+        setTimeout(() => {
+            intermezzo.style.opacity = 0;
+            resolve();
+        }, 3000); // Wait exactly 3 seconds for the CSS animation to complete
+    });
+}
+
 
 async function run(){
     while(true){
@@ -563,21 +663,35 @@ async function run(){
         await hideText();
         await wait(800);
 
+        // -- MODIFICATION: "after laminated fade out everything" --
         stroke.style.opacity = 0;
+        cardContent.style.opacity = 0;
+        card.style.opacity = 0;
+        
+        await wait(800); // Give it time to fully fade out
 
-        /* 3. NEW DESIGN INTRODUCTION */
-        await showText(
-            "NEW DESIGN", 
-            `<div class="desc-line" style="color: white; font-weight: 400;">Sleeker dimensions engineered for effortless everyday portability</div>`
-        );
-        await wait(2500);
-        await hideText();
-        await wait(800); 
+        // Pre-setup the card's dimensions silently so it pops correctly during fade-in
+        currentCardWidth = 480;
+        currentCardHeight = 320;
+        card.style.transition = "none";
+        card.style.width = "480px";
+        card.style.height = "320px";
+        card.style.transform = "translate(-50%,-50%) scale(0.85)"; 
+        updateMeasurements();
+
+        // -- MODIFICATION: "animation of Title 'Red Design' under subtitle ... animate epic intro..." --
+        await triggerEpicText(); // Exact 3.0s duration cinematic sequence
+
+        // -- MODIFICATION: "then fade in continue to pocker landscape" --
+        card.style.transition = "all 1.5s cubic-bezier(.22,1,.36,1)";
+        card.style.opacity = 1;
+        card.style.transform = "translate(-50%,-50%) scale(1)";
+        
+        await wait(1000);
+        cardContent.style.opacity = 1;
+        await wait(600);
 
         /* 4. POCKET LANDSCAPE */
-        card.style.transition = "all 1.5s cubic-bezier(.22,1,.36,1)";
-        await resizeCard(480, 320);
-
         await showMeasure('3 Inch', '2 Inch');
         await showText(
             "POCKET LANDSCAPE", 
