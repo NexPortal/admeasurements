@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="description" content="Premium Card Design Animation Sequence">
 <title>Premium Card Animation</title>
 
 <style>
@@ -29,14 +30,15 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-/* Global Top Brand Text */
 .global-brand {
     position: fixed;
     top: 35px;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateZ(0); /* GPU Acceleration */
     font-size: 20px;
     font-weight: 800;
     letter-spacing: 4px;
@@ -44,6 +46,7 @@ body {
     z-index: 1001;
     text-shadow: 0 4px 15px rgba(0,0,0,0.8);
     pointer-events: none;
+    will-change: transform;
 }
 
 .global-brand .red-text { color: var(--red-brand); }
@@ -57,7 +60,6 @@ body {
     z-index: 10;
 }
 
-/* Intermezzo Overlay Text */
 .intermezzo {
     position: fixed;
     inset: 0;
@@ -68,6 +70,7 @@ body {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.4s ease;
+    will-change: opacity;
 }
 
 .inter-content {
@@ -75,6 +78,7 @@ body {
     z-index: 501;
     text-align: center;
     opacity: 0;
+    will-change: transform, opacity, filter;
 }
 
 .inter-content.epic-anim {
@@ -82,10 +86,10 @@ body {
 }
 
 @keyframes epicSequence {
-    0% { transform: scale(0.4); opacity: 0; filter: blur(15px); }
-    20% { transform: scale(0.85); opacity: 1; filter: blur(0px); }
-    80% { transform: scale(0.95); opacity: 1; filter: blur(0px); }
-    100% { transform: scale(1.4); opacity: 0; filter: blur(12px); }
+    0% { transform: scale3d(0.4, 0.4, 1); opacity: 0; filter: blur(15px); }
+    20% { transform: scale3d(0.85, 0.85, 1); opacity: 1; filter: blur(0px); }
+    80% { transform: scale3d(0.95, 0.95, 1); opacity: 1; filter: blur(0px); }
+    100% { transform: scale3d(1.4, 1.4, 1); opacity: 0; filter: blur(12px); }
 }
 
 .inter-title {
@@ -116,6 +120,7 @@ body {
     transition: transform 0.2s ease-out;
     position: relative;
     top: -15vh;
+    will-change: transform;
 }
 
 .wrapper {
@@ -123,13 +128,14 @@ body {
     width: 1000px;
     height: 1000px;
     transform-origin: center;
+    will-change: transform, opacity;
 }
 
 .card {
     position: absolute;
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%) scale(0);
+    transform: translate3d(-50%, -50%, 0) scale3d(0, 0, 1); /* 3D Transform for GPU */
     width: 560px;
     height: 400px;
     border-radius: 28px;
@@ -140,6 +146,7 @@ body {
         inset 0 1px 0 rgba(255,255,255,1),
         inset 0 -1px 2px rgba(0,0,0,0.05);
     overflow: hidden;
+    will-change: transform, opacity, width, height;
 }
 
 .stroke {
@@ -150,9 +157,10 @@ body {
     height: 432px;
     border-radius: 34px;
     border: 2px solid rgba(255, 255, 255, 0.4);
-    transform: translate(-50%, -50%) scale(0.95);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.95, 0.95, 1);
     opacity: 0;
     box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    will-change: transform, opacity;
 }
 
 .card-content {
@@ -160,19 +168,21 @@ body {
     inset: 0;
     opacity: 0;
     transition: opacity 1s ease;
+    will-change: opacity;
 }
 
 .card-info {
     position: absolute;
     left: 45px;
     top: 50%;
-    transform: translateY(-50%);
+    transform: translateY(-50%) translateZ(0);
     display: flex;
     flex-direction: column;
     gap: 8px;
     transition: all 1.5s cubic-bezier(.22,1,.36,1);
     color: #333;
     width: calc(100% - 210px);
+    will-change: transform, left, top, width;
 }
 
 .info-row {
@@ -196,7 +206,7 @@ body {
     position: absolute;
     right: 45px;
     top: 50%;
-    transform: translateY(-50%);
+    transform: translateY(-50%) translateZ(0);
     width: 140px;
     height: 140px;
     background: #fff;
@@ -207,12 +217,13 @@ body {
     justify-content: center;
     align-items: center;
     padding: 10px;
+    will-change: transform, right, top, width, height;
 }
 
 .card.is-portrait .card-info {
     left: 50%;
     top: 72%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) translateZ(0);
     text-align: center;
     align-items: center;
     width: 90%;
@@ -221,7 +232,7 @@ body {
 .card.is-portrait .card-qr {
     right: 50%;
     top: 30%;
-    transform: translate(50%, -50%);
+    transform: translate(50%, -50%) translateZ(0);
     width: 170px;
     height: 170px;
 }
@@ -230,7 +241,7 @@ body {
     position: absolute;
     left: 50%;
     top: 760px;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateZ(0);
     color: #ffffff;
     letter-spacing: 12px;
     font-size: 32px; 
@@ -240,13 +251,14 @@ body {
     text-shadow: 0 4px 15px rgba(0,0,0,0.9);
     transition: opacity 0.6s ease, top 1.5s cubic-bezier(.22,1,.36,1);
     white-space: nowrap;
+    will-change: opacity, top;
 }
 
 .description {
     position: absolute;
     left: 50%;
     top: 820px;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateZ(0);
     color: var(--muted-white);
     font-size: 24px; 
     font-weight: 300;
@@ -260,6 +272,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    will-change: opacity, top;
 }
 
 .desc-line {
@@ -274,20 +287,23 @@ body {
     opacity: 0;
     transition: opacity 0.6s;
     z-index: 5;
+    will-change: opacity, left, top;
 }
 
 .h-line {
     height: 2px;
     background: var(--cyan);
     transform-origin: center;
-    transform: scaleX(0);
+    transform: scaleX(0) translateZ(0);
+    will-change: transform, width;
 }
 
 .v-line {
     width: 2px;
     background: var(--cyan);
     transform-origin: center;
-    transform: scaleY(0);
+    transform: scaleY(0) translateZ(0);
+    will-change: transform, height;
 }
 
 .label {
@@ -298,6 +314,7 @@ body {
     letter-spacing: 2px;
     text-shadow: 0 2px 8px rgba(0,0,0,0.8);
     white-space: nowrap;
+    will-change: transform;
 }
 
 .footer-bar {
@@ -313,6 +330,7 @@ body {
     gap: 50px;
     z-index: 1000;
     box-shadow: 0 -6px 40px rgba(0,0,0,0.5); 
+    transform: translateZ(0);
 }
 
 .footer-link {
@@ -326,6 +344,7 @@ body {
     letter-spacing: 0.5px;
     opacity: 0.7;
     transition: all 0.2s ease;
+    will-change: transform, opacity;
 }
 
 .footer-link:hover {
@@ -338,10 +357,11 @@ body {
     transition: transform 0.2s ease;
     width: 26px; 
     height: 26px;
+    will-change: transform;
 }
 
 .footer-link:hover svg {
-    transform: scale(1.1);
+    transform: scale3d(1.1, 1.1, 1);
 }
 
 @media (max-width: 600px) {
@@ -365,7 +385,6 @@ body {
 </head>
 <body>
 
-<!-- Global Top Header per request -->
 <div class="global-brand">
     <span class="red-text">Red</span> <span class="white-text">Design</span>
 </div>
@@ -472,9 +491,12 @@ const widthLabel = document.getElementById("widthLabel");
 const heightLabel = document.getElementById("heightLabel");
 const wrapper = document.getElementById("wrapper");
 const scaleContainer = document.getElementById("scaleContainer");
+const intermezzo = document.getElementById('intermezzo');
+const interContent = document.getElementById('interContent');
 
 let currentCardWidth = 560;
 let currentCardHeight = 400;
+let resizeFrame;
 
 function wait(ms){
     return new Promise(r => setTimeout(r, ms));
@@ -490,7 +512,8 @@ function updateScale() {
         scale = Math.min((screenWidth * 0.95) / 860, (screenHeight * 0.80) / 1000);
     }
     
-    scaleContainer.style.transform = `scale(${scale})`;
+    // Use scale3d for hardware acceleration
+    scaleContainer.style.transform = `scale3d(${scale}, ${scale}, 1)`;
 }
 
 function updateMeasurements(){
@@ -506,7 +529,7 @@ function updateMeasurements(){
 
     widthLabel.style.left = "50%";
     widthLabel.style.top = "-40px";
-    widthLabel.style.transform = "translateX(-50%)";
+    widthLabel.style.transform = "translateX(-50%) translateZ(0)";
 
     heightMeasure.style.left = (leftOffset - 60) + "px";
     heightMeasure.style.top = topOffset + "px";
@@ -514,7 +537,7 @@ function updateMeasurements(){
 
     heightLabel.style.left = "-20px";
     heightLabel.style.top = "50%";
-    heightLabel.style.transform = "translate(-100%, -50%) rotate(-90deg)";
+    heightLabel.style.transform = "translate(-100%, -50%) rotate(-90deg) translateZ(0)";
 }
 
 function togglePortraitMode(isPortrait) {
@@ -538,13 +561,13 @@ async function showMeasure(w, h){
     await wait(50);
     hLine.style.transition = "1s cubic-bezier(.22,1,.36,1)";
     vLine.style.transition = "1s cubic-bezier(.22,1,.36,1)";
-    hLine.style.transform = "scaleX(1)";
-    vLine.style.transform = "scaleY(1)";
+    hLine.style.transform = "scaleX(1) translateZ(0)";
+    vLine.style.transform = "scaleY(1) translateZ(0)";
 }
 
 async function hideMeasure(){
-    hLine.style.transform = "scaleX(0)";
-    vLine.style.transform = "scaleY(0)";
+    hLine.style.transform = "scaleX(0) translateZ(0)";
+    vLine.style.transform = "scaleY(0) translateZ(0)";
     await wait(600);
     widthMeasure.style.opacity = 0;
     heightMeasure.style.opacity = 0;
@@ -574,27 +597,23 @@ async function resizeCard(w, h){
 // Epic 3-Second Cinematic Text Animation
 function triggerEpicText() {
     return new Promise(resolve => {
-        const intermezzo = document.getElementById('intermezzo');
-        const interContent = document.getElementById('interContent');
-        
         intermezzo.style.opacity = 1;
         interContent.classList.remove('epic-anim');
-        void interContent.offsetWidth; // trigger DOM reflow to restart CSS animation
+        void interContent.offsetWidth; // trigger DOM reflow to restart CSS animation (necessary evil)
         interContent.classList.add('epic-anim');
 
         setTimeout(() => {
             intermezzo.style.opacity = 0;
             resolve();
-        }, 3000); // Wait exactly 3 seconds for the CSS animation to complete
+        }, 3000); 
     });
 }
-
 
 async function run(){
     while(true){
         wrapper.style.transition = "none";
         wrapper.style.opacity = 1;
-        wrapper.style.transform = "scale(1)";
+        wrapper.style.transform = "scale3d(1, 1, 1)";
 
         currentCardWidth = 560;
         currentCardHeight = 400;
@@ -603,7 +622,7 @@ async function run(){
         card.style.width = "560px";
         card.style.height = "400px";
         card.style.opacity = 0;
-        card.style.transform = "translate(-50%,-50%) scale(0.2)";
+        card.style.transform = "translate3d(-50%,-50%, 0) scale3d(0.2, 0.2, 1)";
         cardContent.style.opacity = 0;
 
         togglePortraitMode(false);
@@ -614,15 +633,15 @@ async function run(){
 
         widthMeasure.style.opacity = 0;
         heightMeasure.style.opacity = 0;
-        hLine.style.transform = "scaleX(0)";
-        vLine.style.transform = "scaleY(0)";
+        hLine.style.transform = "scaleX(0) translateZ(0)";
+        vLine.style.transform = "scaleY(0) translateZ(0)";
 
         await wait(500);
 
         /* 1. ORIGINAL */
         card.style.transition = "all 1.4s cubic-bezier(.22,1,.36,1)";
         card.style.opacity = 1;
-        card.style.transform = "translate(-50%,-50%) scale(1)";
+        card.style.transform = "translate3d(-50%,-50%, 0) scale3d(1, 1, 1)";
         
         await wait(800);
         cardContent.style.opacity = 1; 
@@ -645,7 +664,7 @@ async function run(){
         /* 2. LAMINATED */
         stroke.style.transition = "all 1.2s cubic-bezier(.22,1,.36,1)";
         stroke.style.opacity = 1;
-        stroke.style.transform = "translate(-50%,-50%) scale(1)";
+        stroke.style.transform = "translate3d(-50%,-50%, 0) scale3d(1, 1, 1)";
 
         await wait(1200);
 
@@ -663,29 +682,25 @@ async function run(){
         await hideText();
         await wait(800);
 
-        // -- MODIFICATION: "after laminated fade out everything" --
         stroke.style.opacity = 0;
         cardContent.style.opacity = 0;
         card.style.opacity = 0;
         
-        await wait(800); // Give it time to fully fade out
+        await wait(800); 
 
-        // Pre-setup the card's dimensions silently so it pops correctly during fade-in
         currentCardWidth = 480;
         currentCardHeight = 320;
         card.style.transition = "none";
         card.style.width = "480px";
         card.style.height = "320px";
-        card.style.transform = "translate(-50%,-50%) scale(0.85)"; 
+        card.style.transform = "translate3d(-50%,-50%, 0) scale3d(0.85, 0.85, 1)"; 
         updateMeasurements();
 
-        // -- MODIFICATION: "animation of Title 'Red Design' under subtitle ... animate epic intro..." --
-        await triggerEpicText(); // Exact 3.0s duration cinematic sequence
+        await triggerEpicText();
 
-        // -- MODIFICATION: "then fade in continue to pocker landscape" --
         card.style.transition = "all 1.5s cubic-bezier(.22,1,.36,1)";
         card.style.opacity = 1;
-        card.style.transform = "translate(-50%,-50%) scale(1)";
+        card.style.transform = "translate3d(-50%,-50%, 0) scale3d(1, 1, 1)";
         
         await wait(1000);
         cardContent.style.opacity = 1;
@@ -725,14 +740,20 @@ async function run(){
 
         /* Cinematic fading exit */
         wrapper.style.transition = "all 2.5s cubic-bezier(.22,1,.36,1)";
-        wrapper.style.transform = "scale(.35)";
+        wrapper.style.transform = "scale3d(.35, .35, 1)";
         wrapper.style.opacity = 0;
 
         await wait(3000);
     }
 }
 
-window.addEventListener("resize", updateScale);
+// Optimized resize listener with requestAnimationFrame debounce
+window.addEventListener("resize", () => {
+    if (resizeFrame) cancelAnimationFrame(resizeFrame);
+    resizeFrame = requestAnimationFrame(updateScale);
+});
+
+// Init
 updateScale();
 run();
 
